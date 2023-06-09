@@ -30,10 +30,20 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     
     Route::post('test-notifkasi', 'Pusat\PenawaranController@notify');
 
-    /*Produk Outlet*/
+    /*Outlet = Produk*/
     Route::get('produk/list', 'ProdukController@list_produk');
     Route::get('produk/detail', 'ProdukController@detail_produk');
     Route::post('produk/create', 'ProdukController@create_produk');
+
+    /*Outlet = Bahan*/
+    Route::get('bahan/list', 'ProdukController@list_bahan');
+    Route::get('bahan/detail', 'ProdukController@detail_bahan');
+    Route::post('bahan/create', 'ProdukController@create_bahan');
+
+    /*Outlet = Add-On*/
+    Route::get('add-on/list', 'ProdukController@list_add_on');
+    Route::get('add-on/detail', 'ProdukController@detail_add_on');
+    Route::post('add-on/create', 'ProdukController@create_add_on');
 
     /*Admin - Outlet*/
     Route::get('outlet/list', 'OutletController@list_outlet');
