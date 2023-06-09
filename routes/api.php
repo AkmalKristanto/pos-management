@@ -35,4 +35,9 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::get('produk/detail', 'ProdukController@detail_produk');
     Route::post('produk/create', 'ProdukController@create_produk');
 
+    /*Admin - Outlet*/
+    Route::get('outlet/list', 'OutletController@list_outlet');
+    Route::get('outlet/detail', 'OutletController@detail_outlet');
+    Route::post('outlet/create', 'OutletController@create_outlet');
+
 });

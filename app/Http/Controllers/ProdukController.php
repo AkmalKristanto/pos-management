@@ -222,6 +222,88 @@ class ProdukController extends Controller
         return response()->json($result);
     }
 
+    public function create_bahan(ProdukRequest $request)
+    {
+        $user = auth()->user();
+        $id_user = $user->id;
+        $cek_outlet = Outlet::Where('id_user', $id_user)
+                        ->Where('id_toko', $user->id_toko)->first();
+        
+        if($cek_outlet == null){
+            $code = 400;
+            $result['status'] = false;
+            $result['message'] = 'Hak Akses Tidak Dibolehkan.';
+            $result['data'] = array();
+
+            return response()->json($result, $code);
+        }
+        $id_outlet = $cek_outlet->id_outlet;
+        // DB::begintransaction();
+        // try {
+            $url_logo = $this->_handleUpload($request->url_logo);
+            $req["id_toko"] = $user->id_toko;
+            $req["id_outlet"] = $id_outlet;
+            $req["id_kategori"] = $request->id_kategori;
+            $req["nama_produk"] = $request->nama_produk;
+            $req["url_logo"] = $url_logo;
+
+            $create_produk = Produk::create($req);
+            if (empty($create_produk)) {
+               throw new \Exception('Gagal Create Produk');
+            }
+            $id_produk = $create_produk->id_produk;
+            if($request->add_on != null){
+                $nama_add_on = explode(",", $request->add_on);
+                foreach($nama_add_on as $val){
+                    $save_add_on = [
+                        'id_produk' => $id_produk,
+                        'nama' => $val,
+                    ];
+                    $create_add_on = ProdukAddOn::create($save_add_on);
+                    if (empty($create_add_on)) {
+                       throw new \Exception('Gagal Create Produk Add On');
+                    }
+                }
+            }
+            if($request->id_produk_add_on != null ){
+                $id_produk_add_on = explode(",", $request->id_produk_add_on);
+                foreach($id_produk_add_on as $val){
+                    $add_on = AddOn::where('id_add_on', $val)->first();
+                    $save_add_on = [
+                        'id_produk' => $id_produk,
+                        'id_add_on' => $add_on->id_add_on,
+                        'nama' => $add_on->nama,
+                    ];
+                    $create_add_on = ProdukAddOn::create($save_add_on);
+                    if (empty($create_add_on)) {
+                       throw new \Exception('Gagal Create Produk Add On');
+                    }
+                }
+            }
+
+            $varian = explode(",", $request->varian);
+            foreach($varian as $val){
+                $save_varian = [
+                    'id_produk' => $id_produk,
+                    'nama_varian' => $val,
+                ];
+                $create_varian = ProdukVarian::create($save_varian);
+                if (empty($create_varian)) {
+                   throw new \Exception('Gagal Create Produk Varian');
+                }
+            }
+
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     return Result::response(array(), $e->getMessage(), 400, false);
+        // }
+        $result['status'] = true;
+        $result['message'] = 'Data Berhasil Dibuat.';
+        $result['data'] = array();
+
+        return response()->json($result);
+    }
+
     protected function resultTransformer($status, $message, $data = null)
     {
         return [
