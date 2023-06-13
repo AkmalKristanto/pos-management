@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\User;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Bahan extends Model
 {
@@ -21,5 +25,4 @@ class Bahan extends Model
         'status_active',
    ];
    public $timestamps = false;
-   protected $guarded = [];
 }

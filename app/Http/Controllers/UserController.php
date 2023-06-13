@@ -134,11 +134,11 @@ class UserController extends Controller
                 'id_toko' => $toko->id_toko,
             ];
             $user = User::create($data_user);
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             return Result::response(array(), $e->getMessage(), 400, false);
         }
-        DB::commit();
         // $token = JWTAuth::fromUser($user);
         // return response()->json(compact('user','token'),201);
         if($user){

@@ -12,9 +12,14 @@ class AddOn extends Model
    protected $primaryKey = 'id_add_on';
    protected $fillable = [
         'id_toko',
+        'id_outlet',
         'nama',
         'status_active'
    ];
    public $timestamps = false;
    protected $guarded = [];
+
+   public function add_on_bahan() {
+      return $this->hasMany(AddOnBahan::class, 'id_add_on', 'id_add_on');
+  }
 }
