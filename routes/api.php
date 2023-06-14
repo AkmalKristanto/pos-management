@@ -21,7 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('register', 'UserController@register');
 Route::post('login', [ 'as' => 'login', 'uses' => 'UserController@login']);
 
-
+/*General*/
 Route::group(['middleware' => 'jwt.verify'], function () {
    
     Route::post('logout', 'UserController@logout');
@@ -29,25 +29,52 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::get('me', 'UserController@me');
     
     Route::post('test-notifkasi', 'Pusat\PenawaranController@notify');
+});
 
-    /*Outlet = Produk*/
+/*SuperAdmin*/
+Route::group(['middleware' => 'jwt.verify'], function () {
+
+    /*Manage Toko*/
+    Route::get('admin/toko/list', 'SuperAdmin\ManageTokoController@list_toko');
+    Route::get('admin/toko/detail', 'SuperAdmin\ManageTokoController@detail_toko');
+    Route::post('admin/toko/create', 'SuperAdmin\ManageTokoController@create_toko');
+
+    /*Manage Toko*/
+    Route::get('admin/outlet/list', 'SuperAdmin\ManageTokoController@list_outlet');
+    Route::get('admin/outlet/detail', 'SuperAdmin\ManageTokoController@detail_outlet');
+    Route::post('admin/outlet/create', 'SuperAdmin\ManageTokoController@create_outlet');
+
+});
+
+/*Outlet*/
+Route::group(['middleware' => 'jwt.verify'], function () {
+
+    /*Produk*/
     Route::get('produk/list', 'ProdukController@list_produk');
     Route::get('produk/detail', 'ProdukController@detail_produk');
     Route::post('produk/create', 'ProdukController@create_produk');
 
-    /*Outlet = Bahan*/
+    /*Bahan*/
     Route::get('bahan/list', 'ProdukController@list_bahan');
     Route::get('bahan/detail', 'ProdukController@detail_bahan');
     Route::post('bahan/create', 'ProdukController@create_bahan');
 
-    /*Outlet = Add-On*/
+    /*Add-On*/
     Route::get('add-on/list', 'ProdukController@list_add_on');
     Route::get('add-on/detail', 'ProdukController@detail_add_on');
     Route::post('add-on/create', 'ProdukController@create_add_on');
 
-    /*Admin - Outlet*/
+    /*Transaksi*/
+    Route::get('transaksi/list', 'TransaksiController@list_transaksi');
+    Route::get('transaksi/detail', 'TransaksiController@detail_transaksi');
+    Route::post('transaksi/create', 'TransaksiController@create_transaksi');
+});
+
+/*Toko*/
+Route::group(['middleware' => 'jwt.verify'], function () {
+
+    /*Outlet*/
     Route::get('outlet/list', 'OutletController@list_outlet');
     Route::get('outlet/detail', 'OutletController@detail_outlet');
     Route::post('outlet/create', 'OutletController@create_outlet');
-
 });
