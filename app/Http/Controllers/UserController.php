@@ -110,6 +110,15 @@ class UserController extends Controller
 
             return response()->json($result, $code);
         }
+        // $cek_username = User::Where('username', $request->username)->first();
+        // if($cek_username != null){
+        //     $code = 400;
+        //     $result['status'] = false;
+        //     $result['message'] = 'Username Sudah Terdaftar';
+        //     $result['data'] = array();
+
+        //     return response()->json($result, $code);
+        // }
         $cek_telepon = User::Where('no_telepon', $request->no_telepon)->first();
         if($cek_telepon != null){
             $code = 400;
