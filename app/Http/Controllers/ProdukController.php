@@ -57,7 +57,7 @@ class ProdukController extends Controller
         $get_produk = Produk::where('id_outlet', $id_outlet)
                             ->where('id_toko', $user->id_toko)
                             ->where('produk.status_active', $status)
-                            ->selectRaw("produk.id_produk, nama_produk, CONCAT('" . $media_url . "', url_logo) as url_logo")
+                            ->selectRaw("produk.id_produk, nama_produk, harga, CONCAT('" . $media_url . "', url_logo) as url_logo")
                             ->orderBy('produk.created_at', 'DESC');
 
         if (!empty($search)) {
@@ -102,7 +102,7 @@ class ProdukController extends Controller
         $get_produk = Produk::where('id_produk', $id_produk)
                             ->where('id_outlet', $id_outlet)
                             ->where('id_toko', $user->id_toko)
-                            ->selectRaw("produk.id_produk, nama_produk, CONCAT('" . $media_url . "', url_logo) as url_logo")
+                            ->selectRaw("produk.id_produk, nama_produk, harga, CONCAT('" . $media_url . "', url_logo) as url_logo")
                             ->first();
         $array_add_on = [];
         $get_add_on = ProdukAddOn::where('id_produk', $id_produk)
@@ -120,6 +120,7 @@ class ProdukController extends Controller
                 array_push($array_bahan, $bahan);
             }
             $add_on = [
+                'id_produk_add_on' => $val->id_produk_add_on,
                 'id_add_on' => $val->id_add_on,
                 'nama' => $val->nama,
                 'array_bahan' => $array_bahan,
@@ -127,6 +128,70 @@ class ProdukController extends Controller
             array_push($array_add_on, $add_on);
         }
         $get_produk['add_on'] = $array_add_on;
+
+        if($get_produk){
+            $result['status'] = true;
+            $result['message'] = 'Data Berhasil Didapatkan.';
+            $result['data'] = $get_produk;
+        } else {
+            $result['status'] = false;
+            $result['message'] = 'Data Gagal Didapatkan.';
+            $result['data'] = array();
+        }
+
+        return response()->json($result);
+    }
+
+    public function detail_menu(Request $request)
+    {
+        $user = auth()->user();
+        $id_user = $user->id;
+        $cek_outlet = Outlet::Where('id_user', $id_user)
+                        ->Where('id_toko', $user->id_toko)->first();
+        
+        if($cek_outlet == null){
+            $code = 400;
+            $result['status'] = false;
+            $result['message'] = 'Hak Akses Tidak Dibolehkan.';
+            $result['data'] = array();
+
+            return response()->json($result, $code);
+        }
+        $id_outlet = $cek_outlet->id_outlet;
+        $id_produk = $request->get('id_produk');
+        $media_url = url('/storage/public');
+        $get = Produk::where('id_produk', $id_produk)
+                            ->where('id_outlet', $id_outlet)
+                            ->where('id_toko', $user->id_toko)
+                            ->selectRaw("produk.id_produk, nama_produk, harga, CONCAT('" . $media_url . "', url_logo) as url_logo")
+                            ->first();
+        $array_add_on = [];
+        $get_add_on = ProdukAddOn::where('id_produk', $id_produk)
+                                ->get();
+        foreach($get_add_on as $val){
+            $add_on = [
+                'id_produk_add_on' => $val->id_produk_add_on,
+                'id_add_on' => $val->id_add_on,
+                'nama' => $val->nama,
+            ];
+            array_push($array_add_on, $add_on);
+        }
+        $array_varian = [];
+        $get_varian = ProdukVarian::where('id_produk', $id_produk)
+                                ->get();
+        foreach($get_varian as $val){
+            $varian = [
+                'id_produk_varian' => $val->id_produk_varian,
+                'nama_varian' => $val->nama_varian,
+            ];
+            array_push($array_varian, $varian);
+        }
+        $get_produk['id_produk'] = $get->id_produk;
+        $get_produk['nama_produk'] = $get->nama_produk;
+        $get_produk['harga'] = $get->harga;
+        $get_produk['url_logo'] = $get->url_logo;
+        $get_produk['add_on'] = $array_add_on;
+        $get_produk['varian'] = $array_varian;
 
         if($get_produk){
             $result['status'] = true;
@@ -164,6 +229,7 @@ class ProdukController extends Controller
             $req["id_outlet"] = $id_outlet;
             $req["id_kategori"] = $request->id_kategori;
             $req["nama_produk"] = $request->nama_produk;
+            $req["harga"] = $request->harga;
             $req["url_logo"] = $url_logo;
 
             $create_produk = Produk::create($req);
@@ -372,7 +438,6 @@ class ProdukController extends Controller
 
             return response()->json($result, $code);
         }
-        dd($cek_outlet);
         $id_outlet = $cek_outlet->id_outlet;
         DB::beginTransaction();
  

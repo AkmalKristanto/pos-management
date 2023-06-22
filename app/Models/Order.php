@@ -15,12 +15,21 @@ class Order extends Model
         'id_toko',
         'id_outlet',
         'no_order',
+        'nama_order',
         'jumlah',
         'tax',
         'service',
+        'payment_method',
+        'payment_status',
+        'type_order',
         'total',
         'status_active',
    ];
    public $timestamps = false;
    protected $guarded = [];
+
+   public function item() {
+      return $this->hasMany(OrderProduk::class, 'id_order', 'id_order');
+  }
+
 }

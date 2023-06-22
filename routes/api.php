@@ -64,6 +64,11 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::get('add-on/detail', 'ProdukController@detail_add_on');
     Route::post('add-on/create', 'ProdukController@create_add_on');
 
+    /*Menu*/
+    Route::get('menu/list', 'ProdukController@list_produk');
+    Route::get('menu/detail', 'ProdukController@detail_menu');
+    Route::post('menu/create', 'ProdukController@create_produk');
+
     /*Transaksi*/
     Route::get('transaksi/list', 'TransaksiController@list_transaksi');
     Route::get('transaksi/detail', 'TransaksiController@detail_transaksi');
