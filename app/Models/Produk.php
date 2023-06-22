@@ -15,6 +15,7 @@ class Produk extends Model
       'id_outlet',
       'id_kategori',
       'nama_produk',
+      'harga',
       'url_logo',
       'status_active',
    ];

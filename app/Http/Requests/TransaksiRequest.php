@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ProdukRequest extends FormRequest
+class TransaksiRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -49,11 +49,14 @@ class ProdukRequest extends FormRequest
     public function rules()
     {
         return [
-            "nama_produk" => "required|max:100",
-            "url_logo" => "required",
-            // "id_produk_add_on" => "required|max:11",
-            "id_kategori" => "required",
-            "harga" => "required|max:10"
+            "nama_order" => "required|max:100",
+            "jumlah" => "required",
+            "tax" => "required",
+            "service" => "required",
+            "total" => "required",
+            "payment_method" => "required",
+            "array_produk" => "required",
+            "type_order" => "required",
         ];
     }
 }

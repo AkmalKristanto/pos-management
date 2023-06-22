@@ -11,6 +11,7 @@ class OrderProduk extends Model
    protected $table = 'order_produk';
    protected $primaryKey = 'id_order_produk';
    protected $fillable = [
+         'id_order',
         'id_produk',
         'id_produk_add_on',
         'id_produk_varian',
