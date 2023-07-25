@@ -106,6 +106,7 @@ class ProdukController extends Controller
                             ->first();
         $array_add_on = [];
         $get_add_on = ProdukAddOn::where('id_produk', $id_produk)
+                                ->where('status_active', 1)
                                 ->get();
         foreach($get_add_on as $val){
             $get = AddOnBahan::Where('id_add_on', $val->id_add_on)
