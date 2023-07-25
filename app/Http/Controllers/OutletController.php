@@ -26,7 +26,7 @@ class OutletController extends Controller
         $file_base64 = base64_decode($image);
         $new_imgname = $time . '.png';
         
-        $filePath = '/img-outlet/' . $new_imgname;
+        $filePath = '/img-profile/' . $new_imgname;
         Storage::disk('storage')->put($filePath, $file_base64);
 
         return $filePath;

@@ -9,6 +9,7 @@ use App\Http\Transformers\Result;
 use Illuminate\Support\Facades\Validator;
 use JWTAuth;
 use DB;
+use Storage;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Models\{Toko, Outlet};
 use App\Http\Requests\RegisterRequest;
@@ -69,6 +70,7 @@ class UserController extends Controller
             $ret['id_role'] = 2;
             $ret['nama_role'] = 'Toko';
             $ret['nama_toko'] = $toko->nama_toko;
+            $ret['username'] = $user->username;
         }elseif($user->is_superadmin != 0){
             $ret['id_role'] = 1;
             $ret['nama_role'] = 'Superadmin';
@@ -84,6 +86,7 @@ class UserController extends Controller
             $ret['id_outlet'] = $outlet->id_outlet;
             $ret['id_toko'] = $toko->id_toko;
             $ret['nama_outlet'] = $outlet->nama_outlet;
+            $ret['username'] = $user->username;
         }
         
         if($ret){
@@ -223,6 +226,49 @@ class UserController extends Controller
         }catch(\JWTException $e) {
             return Result::exception(false, 'Server sedang sibuk, coba lagi.', 500, config('app.debug')==true?$e:'');
         }
+    }
+
+    public function upload_image_profile(Request $request) {
+        $user = auth()->user();
+        $id_user = $user->id;
+        
+        $get_image = $request->url_logo;
+        
+        if($get_image == null){
+            $code = 400;
+            $result['status'] = false;
+            $result['message'] = 'Data Tidak Boleh Kosong.';
+            $result['data'] = array();
+
+            return response()->json($result, $code);
+        }
+        $time = strtotime(date(now())) * 1000;
+        $image_ = explode(',', $get_image);
+        $image = $image_[1];
+
+        $image = str_replace('data:image/png;base64,', '', $image);
+        $image = str_replace(' ', '+', $image);
+        $file_base64 = base64_decode($image);
+        $new_imgname = $time . '.png';
+        
+        $filePath = '/img-profile/' . $new_imgname;
+        Storage::disk('storage')->put($filePath, $file_base64);
+        $req["url_logo"] = $filePath;
+
+        $update_img = User::where('id', $id_user)
+                            ->update($req);
+
+        if($update_img){
+            $result['status'] = true;
+            $result['message'] = 'Data Berhasil Diupdate.';
+            $result['data'] = array();
+        } else {
+            $result['status'] = false;
+            $result['message'] = 'Data Gagal Diupdate.';
+            $result['data'] = array();
+        }
+
+        return response()->json($result);
     }
 
     public function getAuthenticatedUser()

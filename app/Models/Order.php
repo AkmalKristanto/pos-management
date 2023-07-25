@@ -24,6 +24,7 @@ class Order extends Model
         'type_order',
         'total',
         'status_active',
+        'is_draft',
    ];
    public $timestamps = false;
    protected $guarded = [];

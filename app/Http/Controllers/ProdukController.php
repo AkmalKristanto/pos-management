@@ -62,7 +62,7 @@ class ProdukController extends Controller
 
         if (!empty($search)) {
             $get_produk->where(function ($q) use ($search) {
-                return $q->where('produk.keterangan_produk', 'like', '%' . $search . '%');
+                return $q->where('produk.produk', 'like', '%' . $search . '%');
             });
         }
 
@@ -286,6 +286,188 @@ class ProdukController extends Controller
         $result['status'] = true;
         $result['message'] = 'Data Berhasil Dibuat.';
         $result['data'] = array();
+
+        return response()->json($result);
+    }
+
+    public function update_produk(Request $request)
+    {
+        $user = auth()->user();
+        $id_user = $user->id;
+        $cek_outlet = Outlet::Where('id_user', $id_user)
+                        ->Where('id_toko', $user->id_toko)->first();
+        
+        if($cek_outlet == null){
+            $code = 400;
+            $result['status'] = false;
+            $result['message'] = 'Hak Akses Tidak Dibolehkan.';
+            $result['data'] = array();
+
+            return response()->json($result, $code);
+        }
+        $id_outlet = $cek_outlet->id_outlet;
+        $id_produk = $request->id_produk;
+        DB::begintransaction();
+        try {
+            
+            $produk = Produk::findOrFail($id_produk);
+            $produk->id_kategori = $request->id_kategori;
+            $produk->nama_produk = $request->nama_produk;
+            $produk->harga = $request->harga;
+
+            if (!empty($request->url_logo)) {
+                $url_logo = $this->_handleUpload($request->url_logo);
+                $produk->url_logo = $url_logo;
+            }
+
+            $produk->save();
+
+            if (empty($produk)) {
+               throw new \Exception('Gagal Update Produk');
+            }
+            if($request->add_on != null){
+                $nama_add_on = explode(",", $request->add_on);
+                foreach($nama_add_on as $val){
+                    $cek = ProdukAddOn::where('id_produk', $id_produk)
+                                    ->where('nama', $val)
+                                    ->first();
+                    if($cek == null){
+                        $save_add_on = [
+                            'id_produk' => $id_produk,
+                            'nama' => $val,
+                        ];
+                        $create_add_on = ProdukAddOn::create($save_add_on);
+                        if (empty($create_add_on)) {
+                        throw new \Exception('Gagal Create Produk Add On');
+                        }
+                    }else{
+                        if($cek->status_active == '0'){
+                            $active_produk_add_on = ProdukAddOn::where('id_produk_add_on', $cek->id_produk_add_on)
+                                                        ->where('id_produk', $id_produk)
+                                                        ->update(
+                                                            ['status_active' => '1']
+                                                        );
+                        }
+                    }
+                }
+                $disable_produk_add_on = ProdukAddOn::whereNotIn('nama', $nama_add_on)
+                                                    // where('id_produk_add_on', 23)
+                                                    ->where('id_produk', $id_produk)
+                                                    ->update(
+                                                        ['status_active' => '0']
+                                                    );
+            }
+            if($request->id_produk_add_on != null ){
+                $id_produk_add_on = explode(",", $request->id_produk_add_on);
+                foreach($id_produk_add_on as $val){
+                    $add_on = AddOn::where('id_add_on', $val)->first();
+                    $cek_ = ProdukAddOn::where('id_produk', $id_produk)
+                                    ->where('id_add_on', $add_on->id_add_on)
+                                    ->first();
+                    if($cek_ == null){
+                        $save_add_on = [
+                            'id_produk' => $id_produk,
+                            'id_add_on' => $add_on->id_add_on,
+                            'nama' => $add_on->nama,
+                        ];
+                        $create_add_on = ProdukAddOn::create($save_add_on);
+                        if (empty($create_add_on)) {
+                        throw new \Exception('Gagal Create Produk Add On');
+                        }
+                    }else{
+                        if($cek_->status_active == '0'){
+                            $active_produk_add_on = ProdukAddOn::where('id_produk_add_on', $cek_->id_produk_add_on)
+                                                        ->where('id_produk', $id_produk)
+                                                        ->update(
+                                                            ['status_active' => '1']
+                                                        );
+                        }
+                    }
+                    $disable_produk_add_on = ProdukAddOn::whereNotIn('id_add_on', $id_produk_add_on)
+                                                        // where('id_produk_add_on', 23)
+                                                        ->where('id_produk', $id_produk)
+                                                        ->update(
+                                                            ['status_active' => '0']
+                                                        );
+                }
+            }
+
+            if($request->varian != null ){
+                $varian = explode(",", $request->varian);
+                foreach($varian as $val){
+                    $cek__ = ProdukVarian::where('id_produk', $id_produk)
+                                    ->where('nama_varian', $val)
+                                    ->first();
+                                    // dd($cek__);
+                    if($cek__ == null){
+                        $save_varian = [
+                            'id_produk' => $id_produk,
+                            'nama_varian' => $val,
+                        ];
+                        $create_varian = ProdukVarian::create($save_varian);
+                        if (empty($create_varian)) {
+                        throw new \Exception('Gagal Create Produk Varian');
+                        }
+                    }else{
+                        if($cek__->status_active == '0'){
+                            $active_produk_add_on = ProdukVarian::where('id_produk_varian', $cek__->id_produk_varian)
+                                                        ->where('id_produk', $id_produk)
+                                                        ->update(
+                                                            ['status_active' => '1']
+                                                        );
+                        }
+                    }
+                    $disable_produk_add_on = ProdukVarian::whereNotIn('nama_varian', $varian)
+                                                        // where('id_produk_varian', 23)
+                                                        ->where('id_produk', $id_produk)
+                                                        ->update(
+                                                            ['status_active' => '0']
+                                                        );
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return Result::response(array(), $e->getMessage(), 400, false);
+        }
+        $result['status'] = true;
+        $result['message'] = 'Data Berhasil Diupdate.';
+        $result['data'] = array();
+
+        return response()->json($result);
+    }
+
+    public function delete_produk(Request $request)
+    {
+        $user = auth()->user();
+        $id_user = $user->id;
+        $cek_outlet = Outlet::Where('id_user', $id_user)
+                        ->Where('id_toko', $user->id_toko)->first();
+        
+        if($cek_outlet == null){
+            $code = 400;
+            $result['status'] = false;
+            $result['message'] = 'Hak Akses Tidak Dibolehkan.';
+            $result['data'] = array();
+
+            return response()->json($result, $code);
+        }
+        $id_outlet = $cek_outlet->id_outlet;
+        $id_produk = $request->get('id_produk');
+        $get_produk = Produk::where('id_produk', $id_produk)
+                            ->where('id_outlet', $id_outlet)
+                            ->where('id_toko', $user->id_toko)
+                            ->update(['status_active', 0]);
+
+        if($get_produk){
+            $result['status'] = true;
+            $result['message'] = 'Data Berhasil Didapatkan.';
+            $result['data'] = $get_produk;
+        } else {
+            $result['status'] = false;
+            $result['message'] = 'Data Gagal Didapatkan.';
+            $result['data'] = array();
+        }
 
         return response()->json($result);
     }
