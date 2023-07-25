@@ -27,6 +27,7 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::post('logout', 'UserController@logout');
     Route::post('save-token-fcm', 'UserController@generate_token_user');
     Route::get('me', 'UserController@me');
+    Route::post('profile/upload-logo-profile', 'UserController@upload_image_profile');
     
     Route::post('test-notifkasi', 'Pusat\PenawaranController@notify');
 });
@@ -52,7 +53,10 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     /*Produk*/
     Route::get('produk/list', 'ProdukController@list_produk');
     Route::get('produk/detail', 'ProdukController@detail_produk');
+    Route::post('produk/update', 'ProdukController@update_produk');
     Route::post('produk/create', 'ProdukController@create_produk');
+    Route::post('produk/delete', 'ProdukController@delete_produk');
+
 
     /*Bahan*/
     Route::get('bahan/list', 'ProdukController@list_bahan');
@@ -71,6 +75,8 @@ Route::group(['middleware' => 'jwt.verify'], function () {
 
     /*Transaksi*/
     Route::get('transaksi/list', 'TransaksiController@list_transaksi');
+    Route::get('transaksi/list-draft', 'TransaksiController@list_draft_transaksi');
+    Route::post('transaksi/draft', 'TransaksiController@draft_transaksi');
     Route::get('transaksi/detail', 'TransaksiController@detail_transaksi');
     Route::post('transaksi/create', 'TransaksiController@create_transaksi');
 });
