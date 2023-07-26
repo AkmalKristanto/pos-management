@@ -12,6 +12,7 @@ use JWTAuth;
 use DB;
 use Storage;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Http\Resources\{ListTransaksiResource};
 use App\Models\{MasterToko, Order, Outlet, OrderProduk, Penawaran};
 
 class TransaksiController extends Controller
@@ -82,8 +83,8 @@ class TransaksiController extends Controller
                 $end_date = date("Y-m-d 23:59:59");
             }
             if($kategori == '4'){
-                $start_date = date("Y-m-d", strtotime("-1 week")). ' 00:00:00';
-                $end_date = date("Y-m-d", strtotime("-1 week + 6 days")). ' 23:59:59';
+                $start_date = date("Y-m-d", strtotime("monday last week")). ' 00:00:00';
+                $end_date = date("Y-m-d", strtotime("monday last week + 6 days")). ' 23:59:59';
             }
             if($kategori == '5'){
                 $start_date = date("Y-m-d", strtotime("first day of this month")). ' 00:00:00';
@@ -100,17 +101,7 @@ class TransaksiController extends Controller
         }
         $get_pesanan = $get_pesanan->paginate($per_page)->withQueryString();
 
-        if($get_pesanan){
-            $result['status'] = true;
-            $result['message'] = 'Data Berhasil Didapatkan.';
-            $result['data'] = $get_pesanan;
-        } else {
-            $result['status'] = false;
-            $result['message'] = 'Data Gagal Didapatkan.';
-            $result['data'] = array();
-        }
-
-        return response()->json($result);
+        return ListTransaksiResource::collection($get_pesanan);
     }
 
     public function detail_transaksi(Request $request)

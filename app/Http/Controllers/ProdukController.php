@@ -130,6 +130,18 @@ class ProdukController extends Controller
         }
         $get_produk['add_on'] = $array_add_on;
 
+        $array_varian = [];
+        $get_varian = ProdukVarian::where('id_produk', $id_produk)
+                                ->get();
+        foreach($get_varian as $val){
+            $varian = [
+                'id_produk_varian' => $val->id_produk_varian,
+                'nama_varian' => $val->nama_varian,
+            ];
+            array_push($array_varian, $varian);
+        }
+        $get_produk['varian'] = $array_varian;
+
         if($get_produk){
             $result['status'] = true;
             $result['message'] = 'Data Berhasil Didapatkan.';
@@ -458,15 +470,15 @@ class ProdukController extends Controller
         $get_produk = Produk::where('id_produk', $id_produk)
                             ->where('id_outlet', $id_outlet)
                             ->where('id_toko', $user->id_toko)
-                            ->update(['status_active', 0]);
+                            ->update(['status_active' => '0']);
 
         if($get_produk){
             $result['status'] = true;
-            $result['message'] = 'Data Berhasil Didapatkan.';
+            $result['message'] = 'Data Berhasil Dihapus.';
             $result['data'] = $get_produk;
         } else {
             $result['status'] = false;
-            $result['message'] = 'Data Gagal Didapatkan.';
+            $result['message'] = 'Data Gagal Dihapus.';
             $result['data'] = array();
         }
 
