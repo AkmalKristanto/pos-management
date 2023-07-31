@@ -142,6 +142,11 @@ class TransaksiController extends Controller
         } else {
             $get_pesanan['type_order'] = 'Take Away';
         }
+        if ($get_pesanan->payment_method === 1) {
+            $get_pesanan['payment_method'] = 'Cash';
+        } else {
+            $get_pesanan['payment_method'] = 'Other';
+        }
 
         if($get_pesanan){
             $result['status'] = true;

@@ -47,13 +47,18 @@ class ListTransaksiResource extends JsonResource
         }else{
             $type_order = 'Take Away';
         }
+        if ($this->payment_method === 1) {
+            $payment_method = 'Cash';
+        } else {
+            $payment_method = 'Other';
+        }
         return [
             "id_order" => $this->id_order,
             "no_order" => $this->no_order,
             "nama_order" => $this->nama_order,
             "type_order" => $type_order,
             "total" => $this->total,
-            "payment_method" => $this->payment_method,
+            "payment_method" => $payment_method,
             "created_at" => $this->created_at,
             "payment_status" =>  $this->payment_status,
             "kategori" => $kategori
