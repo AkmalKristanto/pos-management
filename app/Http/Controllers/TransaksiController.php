@@ -137,6 +137,11 @@ class TransaksiController extends Controller
                              ])
                             ->orderBy('created_at', 'DESC')
                             ->first();
+        if ($get_pesanan->type_order === 1) {
+            $get_pesanan['type_order'] = 'Dine In';
+        } else {
+            $get_pesanan['type_order'] = 'Take Away';
+        }
 
         if($get_pesanan){
             $result['status'] = true;
@@ -447,17 +452,7 @@ class TransaksiController extends Controller
         }
         $get_pesanan = $get_pesanan->paginate($per_page)->withQueryString();
 
-        if($get_pesanan){
-            $result['status'] = true;
-            $result['message'] = 'Data Berhasil Didapatkan.';
-            $result['data'] = $get_pesanan;
-        } else {
-            $result['status'] = false;
-            $result['message'] = 'Data Gagal Didapatkan.';
-            $result['data'] = array();
-        }
-
-        return response()->json($result);
+        return ListTransaksiResource::collection($get_pesanan);
     }
 
     protected function resultTransformer($status, $message, $data = null)

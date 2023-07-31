@@ -42,11 +42,16 @@ class ListTransaksiResource extends JsonResource
                 $kategori = 6;
             }
         }
+        if ($this->type_order === 1) {
+            $type_order = 'Dine In';
+        }else{
+            $type_order = 'Take Away';
+        }
         return [
             "id_order" => $this->id_order,
             "no_order" => $this->no_order,
             "nama_order" => $this->nama_order,
-            "type_order" => $this->type_order,
+            "type_order" => $type_order,
             "total" => $this->total,
             "payment_method" => $this->payment_method,
             "created_at" => $this->created_at,
