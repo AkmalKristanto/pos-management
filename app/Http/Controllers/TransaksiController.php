@@ -56,6 +56,8 @@ class TransaksiController extends Controller
         $id_outlet = $cek_outlet->id_outlet;
         $kategori = $request->get('kategori');
         $search = $request->get('search');
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
         $page = $request->get('page') ? $request->get('page') : 1;
         $per_page = $request->get('per_page') ? $request->get('per_page') : 20;
         
@@ -66,6 +68,13 @@ class TransaksiController extends Controller
                             ->selectRaw("id_order, no_order, nama_order, type_order , total, payment_method, created_at, payment_status")
                             ->orderBy('created_at', 'DESC');
 
+        if (!empty($search)) {
+            $get_pesanan->where(function ($q) use ($search) {
+                return $q->where('order.nama_order', 'like', '%' . $search . '%')
+                            ->orwhere('order.no_order', 'like', '%' . $search . '%')
+                            ->orwhere('order.total', 'like', '%' . $search . '%');
+            });
+        }
         if (!empty($search)) {
             $get_pesanan->where(function ($q) use ($search) {
                 return $q->where('order.nama_order', 'like', '%' . $search . '%')
@@ -103,7 +112,13 @@ class TransaksiController extends Controller
                         ->where('created_at', '<=', $end_date);
             });
         }
-        $get_pesanan = $get_pesanan->paginate($per_page)->withQueryString();
+        $get_pesanan = $get_pesanan->when($start_date, function ($q, $start_date) {
+                                        $q->whereDate('created_at', '>=', $start_date);
+                                    })
+                                    ->when($end_date, function ($q, $end_date) {
+                                        $q->whereDate('created_at', '<=', $end_date);
+                                    })
+                                    ->paginate($per_page)->withQueryString();
 
         return ListTransaksiResource::collection($get_pesanan);
     }
