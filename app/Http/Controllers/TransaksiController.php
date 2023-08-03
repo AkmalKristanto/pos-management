@@ -75,13 +75,6 @@ class TransaksiController extends Controller
                             ->orwhere('order.total', 'like', '%' . $search . '%');
             });
         }
-        if (!empty($search)) {
-            $get_pesanan->where(function ($q) use ($search) {
-                return $q->where('order.nama_order', 'like', '%' . $search . '%')
-                            ->orwhere('order.no_order', 'like', '%' . $search . '%')
-                            ->orwhere('order.total', 'like', '%' . $search . '%');
-            });
-        }
         if (!empty($kategori)) {
             if($kategori == '1'){
                 $start_date = date("Y-m-d 00:00:00");
