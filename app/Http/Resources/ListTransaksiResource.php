@@ -40,6 +40,8 @@ class ListTransaksiResource extends JsonResource
                 $kategori = 5;
             }elseif($start_date_last_month <= $created_at &&  $created_at <= $end_date_last_month){
                 $kategori = 6;
+            }else{
+                $kategori = '-';
             }
         }
         if ($this->type_order === 1) {

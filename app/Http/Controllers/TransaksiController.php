@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\{OrderRequest, TransaksiRequest};
 use App\Http\Transformers\Result;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use DateTime;
+use DateInterval;
 use JWTAuth;
 use DB;
 use Storage;
@@ -59,6 +62,7 @@ class TransaksiController extends Controller
         $media_url = url('/storage/public');
         $get_pesanan = Order::where('id_toko', $id_toko)
                             ->where('id_outlet', $id_outlet)
+                            ->where('status_active', 1)
                             ->selectRaw("id_order, no_order, nama_order, type_order , total, payment_method, created_at, payment_status")
                             ->orderBy('created_at', 'DESC');
 
